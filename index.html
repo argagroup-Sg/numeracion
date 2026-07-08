@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de Acceso QR</title>
+  <!-- Enlace local a la librería guardada en tu GitHub -->
+  <script src="./html5-qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      color: #1565c0;
+      margin-bottom: 20px;
+    }
+    /* Contenedores de Vistas */
+    #vista-escaneo, #vista-resultado {
+      width: 100%;
+      max-width: 400px;
+      margin: auto;
+    }
+    #reader {
+      width: 100%;
+      min-height: 300px;
+      margin: auto;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #000;
+    }
+    #resultado {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 18px;
+      min-height: 25px;
+    }
+    .green {
+      background: #c8e6c9;
+      color: #1b5e20;
+    }
+    .red {
+      background: #ffcdd2;
+      color: #b71c1c;
+    }
+    .orange {
+      background: #ffe0b2;
+      color: #e65100;
+    }
+    /* Estilos del Formulario de Datos Autorizados */
+    .tarjeta-autorizado {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      border-top: 8px solid #2e7d32;
+      margin-top: 15px;
+    }
+    .badge-exito {
+      background: #e8f5e9;
+      color: #2e7d32;
+      padding: 10px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 20px;
+      margin-bottom: 15px;
+    }
+    .info-grupo {
+      text-align: left;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #f0f0f0;
+      padding-bottom: 6px;
+    }
+    .info-label {
+      font-size: 12px;
+      color: #757575;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+    .info-valor {
+      font-size: 18px;
+      color: #212121;
+      font-weight: 500;
+    }
+    /* Contenedor e Imagen de la Cédula */
+    .contenedor-foto {
+      margin: 15px 0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #eee;
+      border: 1px solid #ddd;
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .foto-cedula {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+    /* Botones */
+    .btn-accion {
+      color: white;
+      padding: 15px 30px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      width: 100%;
+      margin-top: 15px;
+      transition: background 0.2s;
+    }
+    .btn-encender {
+      background: #1565c0;
+      margin-bottom: 15px;
+    }
+    .btn-encender:hover {
+      background: #0d47a1;
+    }
+    .btn-volver {
+      background: #2e7d32;
+    }
+    .btn-volver:hover {
+      background: #1b5e20;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>CONTROL DE ACCESO QR</h1>
+
+  <!-- VISTA 1: PANTALLA DE ESCANEO -->
+  <div id="vista-escaneo">
+    <button class="btn-accion btn-encender" id="btnIniciar" onclick="verificarYArrancar()">SOLICITAR CÁMARA</button>
+    <div id="reader"></div>
+    <div id="resultado"></div>
+  </div>
+
+  <!-- VISTA 2: FORMULARIO DE ACCESO AUTORIZADO (OCULTO POR DEFECTO) -->
+  <div id="vista-resultado" style="display: none;">
+    <div class="tarjeta-autorizado">
+      <div class="badge-exito">✓ ACCESO AUTORIZADO</div>
+      
+      <div class="contenedor-foto">
+        <img id="cedula-img" class="foto-cedula" src="" alt="Fotografía Cédula">
+      </div>
+
+      <div class="info-grupo">
+        <div class="info-label">Nombre Completo</div>
+        <div id="cedula-nombre" class="info-valor">-</div>
+      </div>
+
+      <div class="info-grupo">
+        <div class="info-label">Documento de Identidad</div>
+        <div id="cedula-num" class="info-valor">-</div>
+      </div>
+
+      <div class="info-grupo">
+        <div class="info-label">Turno Asignado</div>
+        <div id="cedula-turno" class="info-valor">-</div>
+      </div>
+
+      <button class="btn-accion btn-volver" onclick="regresarAEscanear()">VOLVER A ESCANEAR</button>
+    </div>
+  </div>
+
+  <script>
+    // URL DE TU IMPLEMENTACIÓN DE GOOGLE APPS SCRIPT 
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw9eWiVJc4lOWiq_DYQs4w1ICL5MlOnnrJ_rEyF8HDxwaRafeOdhbWJJbRpYyizNqev/exec";
+    let html5QrcodeScanner = null;
+    let procesandoScan = false;
+
+    window.onerror = function(msg, url, linenumber) {
+      const r = document.getElementById("resultado");
+      r.className = "red";
+      r.innerHTML = "Error interno: " + msg + " (Línea: " + linenumber + ")";
+      return false;
+    };
+
+    function verificarYArrancar() {
+      const r = document.getElementById("resultado");
+      if (typeof Html5Qrcode === "undefined") {
+        r.className = "red";
+        r.innerHTML = "Error local: El archivo de la librería no se cargó correctamente desde GitHub.";
+        return;
+      }
+      iniciarVideoTransmision();
+    }
+
+    function iniciarVideoTransmision() {
+      document.getElementById("btnIniciar").style.display = "none";
+      const r = document.getElementById("resultado");
+      r.className = "";
+      r.innerHTML = "Conectando con la cámara del dispositivo...";
+      
+      try {
+        html5QrcodeScanner = new Html5Qrcode("reader");
+        const config = {};
+        
+        html5QrcodeScanner.start(
+          { facingMode: "environment" },
+          config,
+          codigoDetectadoEnVivo
+        ).then(() => {
+          r.className = "green";
+          r.innerHTML = "Cámara encendida. Enfoque un código QR.";
+        }).catch(err => {
+          html5QrcodeScanner.start(
+            undefined,
+            config,
+            codigoDetectadoEnVivo
+          ).then(() => {
+            r.className = "green";
+            r.innerHTML = "Cámara encendida. Si es la frontal, gire el teléfono.";
+          }).catch(errFinal => {
+            r.className = "red";
+            r.innerHTML = "Acceso denegado o error de hardware: " + errFinal;
+            document.getElementById("btnIniciar").style.display = "inline-block";
+          });
+        });
+      } catch (exception) {
+        r.className = "red";
+        r.innerHTML = "Fallo en ejecución: " + exception.message;
+      }
+    }
+
+    function codigoDetectadoEnVivo(decodedText) {
+      if (procesandoScan) return;
+      procesandoScan = true;
+      
+      const r = document.getElementById("resultado");
+      r.className = "";
+      r.innerHTML = "Consultando validez del pase...";
+      
+      html5QrcodeScanner.stop().then(() => {
+        const viejoScript = document.getElementById("jsonp-request");
+        if (viejoScript) viejoScript.remove();
+        
+        const script = document.createElement("script");
+        script.id = "jsonp-request";
+        script.src = WEB_APP_URL + "?codigoQR=" + encodeURIComponent(decodedText) + "&callback=procesarRespuestaServidorJSONP";
+        
+        script.onerror = function() {
+          mostrarRespuestaServidor({ ok: false, color: "red", mensaje: "Error crítico de conexión con Google." });
+        };
+        document.body.appendChild(script);
+      }).catch(err => {
+        procesandoScan = false;
+      });
+    }
+
+    // FUNCIÓN DE RETORNO GLOBAL: Llamada por la Web App de Google
+    window.procesarRespuestaServidorJSONP = function(data) {
+      const script = document.getElementById("jsonp-request");
+      if (script) script.remove();
+      mostrarRespuestaServidor(data);
+    };
+
+    function mostrarRespuestaServidor(data) {
+      const r = document.getElementById("resultado");
+      
+      if (data.ok) {
+        // Asignar los datos recibidos al formulario separado
+        document.getElementById("cedula-nombre").innerText = data.nombre || "No especificado";
+        document.getElementById("cedula-num").innerText = data.cedula || "No especificado";
+        document.getElementById("cedula-turno").innerText = data.turno || "No especificado";
+        
+        // Cargar imagen de la cédula optimizada desde Drive
+        const imgElement = document.getElementById("cedula-img");
+        if (data.imagenCedula) {
+          imgElement.src = data.imagenCedula;
+          imgElement.style.display = "block";
+        } else {
+          imgElement.style.display = "none";
+        }
+
+        // CAMBIO DE VISTA: Oculta el escáner y muestra el formulario con el botón volver
+        document.getElementById("vista-escaneo").style.display = "none";
+        document.getElementById("vista-resultado").style.display = "block";
+
+      } else {
+        // SI ES ERROR (Rojo / Naranja): Mantiene la vista de escaneo y muestra el aviso del servidor
+        r.className = data.color || "red";
+        r.innerHTML = `<strong>${data.mensaje || "Error"}</strong><br>
+      ${data.nombre ? 'Nombre: ' + data.nombre + '<br>' : ''}
+      ${data.turno ? 'Turno: ' + data.turno : ''}
+    `;
+        
+        // Espera automática de 8 segundos solo si falló el escaneo, para reabrir cámara
+        setTimeout(() => {
+          r.innerHTML = "";
+          r.className = "";
+          procesandoScan = false;
+          iniciarVideoTransmision();
+        }, 8000);
+      }
+    }
+
+    // FUNCIÓN DEL BOTÓN EN EL FORMULARIO DE RESPUESTA
+    function regresarAEscanear() {
+      // Limpiar los campos del formulario previo
+      document.getElementById("cedula-nombre").innerText = "-";
+      document.getElementById("cedula-num").innerText = "-";
+      document.getElementById("cedula-turno").innerText = "-";
+      document.getElementById("cedula-img").src = "";
+      
+      // Limpiar estados de mensajes
+      const r = document.getElementById("resultado");
+      r.innerHTML = "";
+      r.className = "";
+      
+      // Intercambiar vistas devolviendo el lector a la pantalla
+      document.getElementById("vista-resultado").style.display = "none";
+      document.getElementById("vista-escaneo").style.display = "block";
+      
+      // Rehabilitar bandera de escaneo e inicializar cámara
+      procesandoScan = false;
+      iniciarVideoTransmision();
+    }
+  </script>
+</body>
+</html>
