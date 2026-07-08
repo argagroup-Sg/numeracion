@@ -228,6 +228,7 @@
   </div>
 
   <script>
+    
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby157FTjbp4_Zm98X0LiKhi8WVQgnWsW9G_4BmquA2QxUtInn5v1VTRXyO-D27PxDIl/exec";
     let html5QrcodeScanner = null;
     let procesandoScan = false;
@@ -252,13 +253,12 @@
       const r = document.getElementById("resultado");
       if (typeof Html5Qrcode === "undefined") {
         r.className = "red";
-        r.innerHTML = "Error local: El archivo de la librería no se cargó correctamente desde GitHub.";
+        r.innerHTML = "Error local: El archivo de la librería no se cargó correctamente.";
         return;
       }
       iniciarVideoTransmision();
     }
 
-    // ARRANQUE CORREGIDO BASADO 100% EN TU CÓDIGO NATIVO FUNCIONAL
     function iniciarVideoTransmision() {
       const r = document.getElementById("resultado");
       r.className = "";
@@ -310,7 +310,6 @@
         
         const script = document.createElement("script");
         script.id = "jsonp-request";
-        // Pasamos tanto el código QR como el modo seleccionado por el botón
         script.src = WEB_APP_URL + "?codigoQR=" + encodeURIComponent(decodedText) + "&accion=" + modoAccionActual + "&callback=procesarRespuestaServidorJSONP";
         
         script.onerror = function() {
@@ -322,68 +321,126 @@
       });
     }
 
-    // RETORNO GLOBAL JSONP
+    // RETORNO GLOBAL JSONP CORREGIDO Y FORMATEADO
     window.procesarRespuestaServidorJSONP = function(data) {
-const script = document.getElementById("jsonp-request");
-if (script)
-script.remove();
-const r = document.getElementById("resultado");if (data.ok)
-{r.innerHTML = "";r.className = "";
-// VISTA A: Asignar Número
-if (data.tipoVista === "formularioAsignar") {qrLimpioGuardado =
-data.codigoReal;document.getElementById("asignar-nombre").innerText =
-data.nombre || "No
-especificado";document.getElementById("asignar-cedula").innerText = data.cedula
-|| "No especificado";document.getElementById("inputNumeroAsignado").value =
-"";const imgElement = document.getElementById("asignar-img");if
-(data.imagenCedula) {imgElement.src = data.imagenCedula;imgElement.style.display
-= "block";} else {imgElement.style.display =
-"none";}document.getElementById("vista-escaneo").style.display =
-"none";document.getElementById("vista-formulario-asignar").style.display =
-"block";
-// VISTA B: Confirmar Devolución
-} else if (data.tipoVista ===  "resultadoDevolución")
-{document.getElementById("devolver-mensaje-badge").innerText = "✓ " +
-data.mensaje;document.getElementById("devolver-nombre").innerText = data.nombre
-|| "No especificado";document.getElementById("devolver-cedula").innerText =
-data.cedula || "No especificado";const imgElement =
-document.getElementById("devolver-img");if (data.imagenCedula) {imgElement.src =
-data.imagenCedula;imgElement.style.display = "block";} else
-{imgElement.style.display =
-"none";}document.getElementById("vista-escaneo").style.display =
-"none";document.getElementById("vista-resultado-devolver").style.display =
-"block";} else {
-    // Confirmación de guardadoexitoso
-alert(data.mensaje);regresarAlMenuPrincipal();}} else {r.className =
-data.color || "red";r.innerHTML = <strong>${data.mensaje || "Error"}</strong
-><br />
-${data.nombre ? 'Nombre: ' + data.nombre + '<br />' : ''} ${data.cedula ?
-'Cédula: ' + data.cedula : ''};setTimeout(() => {r.innerHTML = "";r.className =
-"";procesandoScan = false;iniciarVideoTransmision();}, 8000);}};function
-maniobrarErrorServidor(mensaje) {const r =
-document.getElementById("resultado");r.className = "red";r.innerHTML = "" +
-mensaje + "";setTimeout(() => {r.innerHTML = "";r.className = "";procesandoScan
-= false;iniciarVideoTransmision();}, 8000);}
-    function guardarNumeroAsignado()
-{const numeroAsignadoValue =
-document.getElementById("inputNumeroAsignado").value.trim();if
-(!numeroAsignadoValue) {alert("Por favor, digite un número asignado antes de
-guardar.");return;}const viejoScript =
-document.getElementById("jsonp-request");if (viejoScript)
-viejoScript.remove();const script = document.createElement("script");script.id =
-"jsonp-request";script.src = WEB_APP_URL + "?accion=confirmarAsignar&codigoQR="
-+ encodeURIComponent(qrLimpioGuardado) + "&numeroAsignado=" +
-encodeURIComponent(numeroAsignadoValue) +
-"&callback=procesarRespuestaServidorJSONP";document.body.appendChild(script);}
- function cancelarEscaneo() {if (html5QrcodeScanner) {html5QrcodeScanner.stop().then(() =>
-{ regresarAlMenuPrincipal(); }).catch(() => { regresarAlMenuPrincipal(); });}
-else {regresarAlMenuPrincipal();}}
- function regresarAlMenuPrincipal()
-{procesandoScan = false;modoAccionActual = "";qrLimpioGuardado =
-"";document.getElementById("resultado").innerHTML =
-"";document.getElementById("resultado").className =
-"";document.getElementById("vista-formulario-asignar").style.display =
-"none";document.getElementById("vista-resultado-devolver").style.display =
-"none";document.getElementById("btnCancelar").style.display =
-"none";document.getElementById("menu-botones").style.display =
-"block";document.getElementById("vista-escaneo").style.display = "block";}
+      const script = document.getElementById("jsonp-request");
+      if (script) script.remove();
+      
+      const r = document.getElementById("resultado");
+      
+      if (data.ok) {
+        r.innerHTML = "";
+        r.className = "";
+        
+        // VISTA A: Asignar Número
+        if (data.tipoVista === "formularioAsignar") {
+          qrLimpioGuardado = data.codigoReal;
+          document.getElementById("asignar-nombre").innerText = data.nombre || "No especificado";
+          document.getElementById("asignar-cedula").innerText = data.cedula || "No especificado";
+          document.getElementById("inputNumeroAsignado").value = "";
+          
+          const imgElement = document.getElementById("asignar-img");
+          if (data.imagenCedula) {
+            imgElement.src = data.imagenCedula;
+            imgElement.style.display = "block";
+          } else {
+            imgElement.style.display = "none";
+          }
+          
+          document.getElementById("vista-escaneo").style.display = "none";
+          document.getElementById("vista-formulario-asignar").style.display = "block";
+          
+        // VISTA B: Confirmar Devolución
+        } else if (data.tipoVista === "resultadoDevolución") {
+          document.getElementById("devolver-mensaje-badge").innerText = "✓ " + data.mensaje;
+          document.getElementById("devolver-nombre").innerText = data.nombre || "No especificado";
+          document.getElementById("devolver-cedula").innerText = data.cedula || "No especificado";
+          
+          const imgElement = document.getElementById("devolver-img");
+          if (data.imagenCedula) {
+            imgElement.src = data.imagenCedula;
+            imgElement.style.display = "block";
+          } else {
+            imgElement.style.display = "none";
+          }
+          
+          document.getElementById("vista-escaneo").style.display = "none";
+          document.getElementById("vista-resultado-devolver").style.display = "block";
+          
+        } else {
+          // Confirmación de guardado exitoso
+          alert(data.mensaje);
+          regresarAlMenuPrincipal();
+        }
+      } else {
+        // CORRECCIÓN: Comillas de plantilla añadidas correctamente
+        r.className = data.color || "red";
+        r.innerHTML = `<strong>${data.mensaje || "Error"}</strong><br>
+          ${data.nombre ? 'Nombre: ' + data.nombre + '<br>' : ''} 
+          ${data.cedula ? 'Cédula: ' + data.cedula : ''}`;
+        
+        setTimeout(() => {
+          r.innerHTML = "";
+          r.className = "";
+          procesandoScan = false;
+          iniciarVideoTransmision();
+        }, 8000);
+      }
+    };
+
+    function maniobrarErrorServidor(mensaje) {
+      const r = document.getElementById("resultado");
+      r.className = "red";
+      r.innerHTML = "<strong>" + mensaje + "</strong>";
+      setTimeout(() => {
+        r.innerHTML = "";
+        r.className = "";
+        procesandoScan = false;
+        iniciarVideoTransmision();
+      }, 8000);
+    }
+
+    function guardarNumeroAsignado() {
+      const numeroAsignadoValue = document.getElementById("inputNumeroAsignado").value.trim();
+      if (!numeroAsignadoValue) {
+        alert("Por favor, digite un número asignado antes de guardar.");
+        return;
+      }
+      
+      const viejoScript = document.getElementById("jsonp-request");
+      if (viejoScript) viejoScript.remove();
+      
+      const script = document.createElement("script");
+      script.id = "jsonp-request";
+      script.src = WEB_APP_URL + "?accion=confirmarAsignar&codigoQR=" + encodeURIComponent(qrLimpioGuardado) + "&numeroAsignado=" + encodeURIComponent(numeroAsignadoValue) + "&callback=procesarRespuestaServidorJSONP";
+      document.body.appendChild(script);
+    }
+
+    function cancelarEscaneo() {
+      if (html5QrcodeScanner) {
+        html5QrcodeScanner.stop().then(() => { 
+          regresarAlMenuPrincipal(); 
+        }).catch(() => { 
+          regresarAlMenuPrincipal(); 
+        });
+      } else {
+        regresarAlMenuPrincipal();
+      }
+    }
+
+    function regresarAlMenuPrincipal() {
+      procesandoScan = false;
+      modoAccionActual = "";
+      qrLimpioGuardado = "";
+      
+      document.getElementById("resultado").innerHTML = "";
+      document.getElementById("resultado").className = "";
+      
+      document.getElementById("vista-formulario-asignar").style.display = "none";
+      document.getElementById("vista-resultado-devolver").style.display = "none";
+      
+      document.getElementById("btnCancelar").style.display = "none";
+      document.getElementById("menu-botones").style.display = "block";
+      document.getElementById("vista-escaneo").style.display = "block";
+    }
+  </script>
