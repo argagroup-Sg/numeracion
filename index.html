@@ -229,7 +229,7 @@
 
   <script>
     
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby157FTjbp4_Zm98X0LiKhi8WVQgnWsW9G_4BmquA2QxUtInn5v1VTRXyO-D27PxDIl/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzIdkL4WSWESdUh2g10ZmTrh7FgksUuWF_nGyBSUiDw76CfxjHrfbC9B_5l7I1SS9D_/exec";
     let html5QrcodeScanner = null;
     let procesandoScan = false;
     let modoAccionActual = ""; 
@@ -334,7 +334,8 @@
         
         // VISTA A: Asignar Número
         if (data.tipoVista === "formularioAsignar") {
-          qrLimpioGuardado = data.codigoReal;
+          // Guardamos el número de fila que nos devolvió el Sheets
+          qrLimpioGuardado = data.filaDestino; 
           document.getElementById("asignar-nombre").innerText = data.nombre || "No especificado";
           document.getElementById("asignar-cedula").innerText = data.cedula || "No especificado";
           document.getElementById("inputNumeroAsignado").value = "";
@@ -349,6 +350,7 @@
           
           document.getElementById("vista-escaneo").style.display = "none";
           document.getElementById("vista-formulario-asignar").style.display = "block";
+
           
         // VISTA B: Confirmar Devolución
         } else if (data.tipoVista === "resultadoDevolución") {
@@ -412,9 +414,11 @@
       
       const script = document.createElement("script");
       script.id = "jsonp-request";
-      script.src = WEB_APP_URL + "?accion=confirmarAsignar&codigoQR=" + encodeURIComponent(qrLimpioGuardado) + "&numeroAsignado=" + encodeURIComponent(numeroAsignadoValue) + "&callback=procesarRespuestaServidorJSONP";
+      // Enviamos el parámetro filaDestino en lugar del código QR original
+      script.src = WEB_APP_URL + "?accion=confirmarAsignar&filaDestino=" + encodeURIComponent(qrLimpioGuardado) + "&numeroAsignado=" + encodeURIComponent(numeroAsignadoValue) + "&callback=procesarRespuestaServidorJSONP";
       document.body.appendChild(script);
     }
+
 
     function cancelarEscaneo() {
       if (html5QrcodeScanner) {
