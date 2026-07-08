@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Asignacion de Numero por QR</title>
+  <title>Control de Numeración QR</title>
   <!-- Enlace local idéntico a tu repositorio -->
   <script src="./html5-qrcode.min.js"></script>
   <style>
@@ -51,7 +51,7 @@
       background: #ffe0b2;
       color: #e65100;
     }
-    /* Estilos de las Tarjetas de Datos */
+    /* Tarjetas de Datos */
     .tarjeta-datos {
       background: white;
       padding: 20px;
@@ -117,7 +117,7 @@
       font-weight: bold;
       text-align: center;
     }
-    /* Contenedor e Imagen de la Cédula */
+    /* Imagen de la Cédula */
     .contenedor-foto {
       margin: 15px 0;
       border-radius: 8px;
@@ -148,27 +148,13 @@
       margin-top: 15px;
       transition: background 0.2s;
     }
-    .btn-asignar {
-      background: #1565c0;
-    }
-    .btn-asignar:hover {
-      background: #0d47a1;
-    }
-    .btn-devolver {
-      background: #e65100;
-    }
-    .btn-devolver:hover {
-      background: #b23c17;
-    }
-    .btn-volver {
-      background: #2e7d32;
-    }
-    .btn-volver:hover {
-      background: #1b5e20;
-    }
-    .btn-cancelar {
-      background: #757575;
-    }
+    .btn-asignar { background: #1565c0; margin-bottom: 10px; }
+    .btn-asignar:hover { background: #0d47a1; }
+    .btn-devolver { background: #e65100; }
+    .btn-devolver:hover { background: #b23c17; }
+    .btn-volver { background: #2e7d32; }
+    .btn-volver:hover { background: #1b5e20; }
+    .btn-cancelar { background: #757575; }
   </style>
 </head>
 <body>
@@ -178,17 +164,18 @@
   <!-- VISTA 1: PANTALLA DE ESCANEO -->
   <div id="vista-escaneo">
     <div id="menu-botones">
-      <button class="btn-accion btn-asignar" onclick="seleccionarModo('buscarAsignar')">HABILITAR CÁMARA PARA ASIGNAR NÚMERO</button>
-      <button class="btn-accion btn-devolver" onclick="seleccionarModo('devolver')">HABILITAR CÁMARA PARA DEVOLVER</button>
+      <button class="btn-accion btn-asignar" onclick="activarModo('buscarAsignar')">HABILITAR CÁMARA PARA ASIGNAR NÚMERO</button>
+      <button class="btn-accion btn-devolver" onclick="activarModo('devolver')">HABILITAR CÁMARA PARA DEVOLVER</button>
     </div>
     
-    <button class="btn-accion btn-cancelar" id="btnCancelar" style="display: none;" onclick="cancelarYRegresar()">CANCELAR ESCANEO</button>
+    <!-- Botón para apagar la cámara y volver al menú principal de botones -->
+    <button class="btn-accion btn-cancelar" id="btnCancelar" style="display: none; margin-bottom: 15px;" onclick="cancelarEscaneo()">CANCELAR ESCANEO</button>
     
-    <div id="reader" style="display: none; margin-top: 15px;"></div>
+    <div id="reader"></div>
     <div id="resultado"></div>
   </div>
 
-  <!-- VISTA 2: FORMULARIO DE ASIGNACIÓN (OCULTO POR DEFECTO) -->
+  <!-- VISTA 2: FORMULARIO DE ASIGNACIÓN -->
   <div id="vista-formulario-asignar" class="vista-resultado" style="display: none;">
     <div class="tarjeta-datos">
       <div class="badge-estado">✓ ASIGNAR NÚMERO</div>
@@ -217,7 +204,7 @@
     </div>
   </div>
 
-  <!-- VISTA 3: PANTALLA DE CONFIRMACIÓN DE DEVOLUCIÓN (OCULTO POR DEFECTO) -->
+  <!-- VISTA 3: PANTALLA DE CONFIRMACIÓN DE DEVOLUCIÓN -->
   <div id="vista-resultado-devolver" class="vista-resultado" style="display: none;">
     <div class="tarjeta-datos tarjeta-devolver">
       <div id="devolver-mensaje-badge" class="badge-estado badge-devolver">-</div>
@@ -244,8 +231,8 @@
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby157FTjbp4_Zm98X0LiKhi8WVQgnWsW9G_4BmquA2QxUtInn5v1VTRXyO-D27PxDIl/exec";
     let html5QrcodeScanner = null;
     let procesandoScan = false;
-    let modoAccionActual = ""; // Guarda si es 'buscarAsignar' o 'devolver'
-    let qrLimpioGuardado = ""; // Almacena el QR para confirmación de guardado
+    let modoAccionActual = ""; 
+    let qrLimpioGuardado = ""; 
 
     window.onerror = function(msg, url, linenumber) {
       const r = document.getElementById("resultado");
@@ -254,11 +241,10 @@
       return false;
     };
 
-    function seleccionarModo(modo) {
+    function activarModo(modo) {
       modoAccionActual = modo;
       document.getElementById("menu-botones").style.display = "none";
-      document.getElementById("btnCancelar").style.display = "block";
-      document.getElementById("reader").style.display = "block";
+      document.getElementById("btnCancelar").style.display = "inline-block";
       verificarYArrancar();
     }
 
@@ -266,13 +252,13 @@
       const r = document.getElementById("resultado");
       if (typeof Html5Qrcode === "undefined") {
         r.className = "red";
-        r.innerHTML = "Error local: El archivo de la librería no se cargó correctamente.";
+        r.innerHTML = "Error local: El archivo de la librería no se cargó correctamente desde GitHub.";
         return;
       }
       iniciarVideoTransmision();
     }
 
-    // LÓGICA DE INICIALIZACIÓN COPIADA EXACTAMENTE DE TU CÓDIGO ANTERIOR
+    // ARRANQUE CORREGIDO BASADO 100% EN TU CÓDIGO NATIVO FUNCIONAL
     function iniciarVideoTransmision() {
       const r = document.getElementById("resultado");
       r.className = "";
@@ -300,7 +286,8 @@
           }).catch(errFinal => {
             r.className = "red";
             r.innerHTML = "Acceso denegado o error de hardware: " + errFinal;
-            cancelarYRegresar();
+            document.getElementById("menu-botones").style.display = "block";
+            document.getElementById("btnCancelar").style.display = "none";
           });
         });
       } catch (exception) {
@@ -318,36 +305,32 @@
       r.innerHTML = "Consultando validez del pase...";
       
       html5QrcodeScanner.stop().then(() => {
-        // Al detener, llamamos al backend enviando la acción elegida por el botón
-        ejecutarConsultaServidor({ accion: modoAccionActual, codigoQR: decodedText });
+        const viejoScript = document.getElementById("jsonp-request");
+        if (viejoScript) viejoScript.remove();
+        
+        const script = document.createElement("script");
+        script.id = "jsonp-request";
+        // Pasamos tanto el código QR como el modo seleccionado por el botón
+        script.src = WEB_APP_URL + "?codigoQR=" + encodeURIComponent(decodedText) + "&accion=" + modoAccionActual + "&callback=procesarRespuestaServidorJSONP";
+        
+        script.onerror = function() {
+          maniobrarErrorServidor("Error crítico de conexión con Google.");
+        };
+        document.body.appendChild(script);
       }).catch(err => {
         procesandoScan = false;
       });
     }
 
-    function ejecutarConsultaServidor(parametros) {
-      const viejoScript = document.getElementById("jsonp-request");
-      if (viejoScript) viejoScript.remove();
-      
-      let queryStrings = [];
-      for (let clave in parametros) {
-        queryStrings.push(clave + "=" + encodeURIComponent(parametros[clave]));
-      }
-      queryStrings.push("callback=procesarRespuestaServidorJSONP");
-      
-      const script = document.createElement("script");
-script.id = "jsonp-request";script.src = WEB_APP_URL + "?" +
-queryStrings.join("&");script.onerror = function()
-{maniobrarErrorServidor("Error crítico de conexión con
-Google.");};document.body.appendChild(script);}
-// FUNCIÓN DE RETORNO GLOBAL
-  window.procesarRespuestaServidorJSONP = function(data) {const script =
-document.getElementById("jsonp-request");if (script) script.remove();const r =
-document.getElementById("resultado");if (data.ok) {r.innerHTML = "";r.className
-= "";
-// CASO A: Muestra Formulario para ingresar número
-if (data.tipoVista ===
-"formularioAsignar") {qrLimpioGuardado =
+    // RETORNO GLOBAL JSONP
+    window.procesarRespuestaServidorJSONP = function(data) {
+const script = document.getElementById("jsonp-request");
+if (script)
+script.remove();
+const r = document.getElementById("resultado");if (data.ok)
+{r.innerHTML = "";r.className = "";
+// VISTA A: Asignar Número
+if (data.tipoVista === "formularioAsignar") {qrLimpioGuardado =
 data.codigoReal;document.getElementById("asignar-nombre").innerText =
 data.nombre || "No
 especificado";document.getElementById("asignar-cedula").innerText = data.cedula
@@ -358,9 +341,8 @@ especificado";document.getElementById("asignar-cedula").innerText = data.cedula
 "none";}document.getElementById("vista-escaneo").style.display =
 "none";document.getElementById("vista-formulario-asignar").style.display =
 "block";
-                      // CASO B: Muestra Respuesta de Devolución exitosa
-                     } else if
-(data.tipoVista === "resultadoDevolución")
+// VISTA B: Confirmar Devolución
+} else if (data.tipoVista ===  "resultadoDevolución")
 {document.getElementById("devolver-mensaje-badge").innerText = "✓ " +
 data.mensaje;document.getElementById("devolver-nombre").innerText = data.nombre
 || "No especificado";document.getElementById("devolver-cedula").innerText =
@@ -371,41 +353,37 @@ data.imagenCedula;imgElement.style.display = "block";} else
 "none";}document.getElementById("vista-escaneo").style.display =
 "none";document.getElementById("vista-resultado-devolver").style.display =
 "block";} else {
-  // Caso C: Confirmación de guardado de número
-completadoalert(data.mensaje);regresarAlMenuPrincipal();}} else {
-    // RESPUESTACON ERROR DESDE EL SERVIDOR
-  r.className = data.color || "red";r.innerHTML =
-<strong>${data.mensaje || "Error"}</strong><br />
+    // Confirmación de guardadoexitoso
+alert(data.mensaje);regresarAlMenuPrincipal();}} else {r.className =
+data.color || "red";r.innerHTML = <strong>${data.mensaje || "Error"}</strong
+><br />
 ${data.nombre ? 'Nombre: ' + data.nombre + '<br />' : ''} ${data.cedula ?
 'Cédula: ' + data.cedula : ''};setTimeout(() => {r.innerHTML = "";r.className =
 "";procesandoScan = false;iniciarVideoTransmision();}, 8000);}};function
 maniobrarErrorServidor(mensaje) {const r =
 document.getElementById("resultado");r.className = "red";r.innerHTML = "" +
 mensaje + "";setTimeout(() => {r.innerHTML = "";r.className = "";procesandoScan
-= false;iniciarVideoTransmision();}, 8000);}function guardarNumeroAsignado()
+= false;iniciarVideoTransmision();}, 8000);}
+    function guardarNumeroAsignado()
 {const numeroAsignadoValue =
 document.getElementById("inputNumeroAsignado").value.trim();if
 (!numeroAsignadoValue) {alert("Por favor, digite un número asignado antes de
-guardar.");return;}ejecutarConsultaServidor({accion:
-"confirmarAsignar",codigoQR: qrLimpioGuardado,numeroAsignado:
-numeroAsignadoValue});}function cancelarYRegresar() {if (html5QrcodeScanner)
-{html5QrcodeScanner.stop().then(() => { regresarAlMenuPrincipal(); }).catch(()
-=> { regresarAlMenuPrincipal(); });} else {regresarAlMenuPrincipal();}}function
-regresarAlMenuPrincipal() {procesandoScan = false;modoAccionActual =
-"";qrLimpioGuardado = "";
-                           // Limpiar textos e imágenes de respaldo
-  document.getElementById("resultado").innerHTML =
+guardar.");return;}const viejoScript =
+document.getElementById("jsonp-request");if (viejoScript)
+viejoScript.remove();const script = document.createElement("script");script.id =
+"jsonp-request";script.src = WEB_APP_URL + "?accion=confirmarAsignar&codigoQR="
++ encodeURIComponent(qrLimpioGuardado) + "&numeroAsignado=" +
+encodeURIComponent(numeroAsignadoValue) +
+"&callback=procesarRespuestaServidorJSONP";document.body.appendChild(script);}
+ function cancelarEscaneo() {if (html5QrcodeScanner) {html5QrcodeScanner.stop().then(() =>
+{ regresarAlMenuPrincipal(); }).catch(() => { regresarAlMenuPrincipal(); });}
+else {regresarAlMenuPrincipal();}}
+ function regresarAlMenuPrincipal()
+{procesandoScan = false;modoAccionActual = "";qrLimpioGuardado =
+"";document.getElementById("resultado").innerHTML =
 "";document.getElementById("resultado").className =
-"";document.getElementById("asignar-nombre").innerText =
-"-";document.getElementById("asignar-cedula").innerText =
-"-";document.getElementById("asignar-img").src =
-"";document.getElementById("devolver-nombre").innerText =
-"-";document.getElementById("devolver-cedula").innerText =
-"-";document.getElementById("devolver-img").src = "";
-                           // Restablecer vistas ocultas e intermitentes
-  document.getElementById("vista-formulario-asignar").style.display =
+"";document.getElementById("vista-formulario-asignar").style.display =
 "none";document.getElementById("vista-resultado-devolver").style.display =
-"none";document.getElementById("reader").style.display =
 "none";document.getElementById("btnCancelar").style.display =
 "none";document.getElementById("menu-botones").style.display =
 "block";document.getElementById("vista-escaneo").style.display = "block";}
