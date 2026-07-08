@@ -4,43 +4,159 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Control de Numeración QR</title>
+  <!-- Enlace local idéntico a tu raíz -->
   <script src="./html5-qrcode.min.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin: 20px; background-color: #f5f5f5; }
-    h1 { color: #1565c0; margin-bottom: 20px; font-size: 24px; }
-    
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      color: #1565c0;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
     /* Contenedores de Vistas */
-    .vista-contenedor { width: 100%; max-width: 400px; margin: auto; }
-    #reader { width: 100%; min-height: 300px; margin: auto; border-radius: 10px; overflow: hidden; background: #000; display: none; }
-    
-    #resultado { margin-top: 20px; padding: 15px; border-radius: 10px; font-weight: bold; font-size: 16px; min-height: 25px; }
-    .green { background: #c8e6c9; color: #1b5e20; }
-    .red { background: #ffcdd2; color: #b71c1c; }
-    .orange { background: #ffe0b2; color: #e65100; }
+    .vista-contenedor {
+      width: 100%;
+      max-width: 400px;
+      margin: auto;
+    }
+    #reader {
+      width: 100%;
+      min-height: 300px;
+      margin: auto;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #000;
+    }
+    #resultado {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 18px;
+      min-height: 25px;
+    }
+    .green {
+      background: #c8e6c9;
+      color: #1b5e20;
+    }
+    .red {
+      background: #ffcdd2;
+      color: #b71c1c;
+    }
+    .orange {
+      background: #ffe0b2;
+      color: #e65100;
+    }
 
     /* Tarjetas y Formularios */
-    .tarjeta { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 8px solid #1565c0; margin-top: 15px; }
-    .tarjeta-devuelto { border-top-color: #e65100; }
+    .tarjeta {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      border-top: 8px solid #1565c0;
+      margin-top: 15px;
+    }
+    .tarjeta-devuelto {
+      border-top-color: #e65100;
+    }
     
-    .badge { padding: 10px; border-radius: 6px; font-weight: bold; font-size: 18px; margin-bottom: 15px; text-transform: uppercase; }
-    .badge-asignar { background: #e3f2fd; color: #0d47a1; }
-    .badge-devolver { background: #fff3e0; color: #e65100; }
+    .badge {
+      padding: 10px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+    }
+    .badge-asignar {
+      background: #e3f2fd;
+      color: #0d47a1;
+    }
+    .badge-devolver {
+      background: #fff3e0;
+      color: #e65100;
+    }
 
-    .info-grupo { text-align: left; margin-bottom: 12px; border-bottom: 1px solid #f0f0f0; padding-bottom: 6px; }
-    .info-label { font-size: 11px; color: #757575; text-transform: uppercase; font-weight: bold; }
-    .info-valor { font-size: 16px; color: #212121; font-weight: 500; }
+    .info-grupo {
+      text-align: left;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #f0f0f0;
+      padding-bottom: 6px;
+    }
+    .info-label {
+      font-size: 12px;
+      color: #757575;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+    .info-valor {
+      font-size: 18px;
+      color: #212121;
+      font-weight: 500;
+    }
     
     /* Input Estilizado */
-    .campo-entrada { text-align: left; margin: 15px 0; }
-    .campo-entrada label { font-size: 12px; font-weight: bold; color: #1565c0; text-transform: uppercase; display: block; margin-bottom: 5px; }
-    .input-texto { width: 100%; padding: 12px; font-size: 18px; border: 2px solid #1565c0; border-radius: 6px; box-sizing: border-box; font-weight: bold; text-align: center; }
+    .campo-entrada {
+      text-align: left;
+      margin: 15px 0;
+    }
+    .campo-entrada label {
+      font-size: 12px;
+      font-weight: bold;
+      color: #1565c0;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 5px;
+    }
+    .input-texto {
+      width: 100%;
+      padding: 12px;
+      font-size: 18px;
+      border: 2px solid #1565c0;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-weight: bold;
+      text-align: center;
+    }
 
-    /* Contenedor Imagen */
-    .contenedor-foto { margin: 15px 0; border-radius: 8px; overflow: hidden; background: #eee; border: 1px solid #ddd; min-height: 150px; display: flex; align-items: center; justify-content: center; }
-    .foto-cedula { width: 100%; height: auto; display: block; object-fit: contain; }
+    /* Contenedor e Imagen de la Cédula */
+    .contenedor-foto {
+      margin: 15px 0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #eee;
+      border: 1px solid #ddd;
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .foto-cedula {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
 
     /* Botones */
-    .btn-accion { color: white; padding: 15px 20px; font-size: 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; transition: background 0.2s; }
+    .btn-accion {
+      color: white;
+      padding: 15px 20px;
+      font-size: 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      width: 100%;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
     .btn-azul { background: #1565c0; }
     .btn-azul:hover { background: #0d47a1; }
     .btn-naranja { background: #e65100; }
@@ -62,7 +178,9 @@
       <button class="btn-accion btn-naranja" onclick="configurarModoEscaneo('devolver')">HABILITAR CÁMARA PARA DEVOLVER</button>
     </div>
     <button class="btn-accion btn-gris" id="btnCancelarCamara" style="display:none;" onclick="cancelarEscaneo()">CANCELAR ESCANEO</button>
-    <div id="reader" style="margin-top:15px;"></div>
+    
+    <!-- Contenedor del lector visible solo cuando se activa -->
+    <div id="reader" style="display:none; margin-top:15px;"></div>
     <div id="resultado"></div>
   </div>
 
@@ -79,13 +197,13 @@
         <div id="asignar-nombre" class="info-valor">-</div>
       </div>
       <div class="info-grupo">
-        <div class="info-label">Cédula</div>
+        <div class="info-label">Documento de Identidad</div>
         <div id="asignar-cedula" class="info-valor">-</div>
       </div>
 
       <div class="campo-entrada">
         <label for="inputNumeroAsignado">Número a Asignar:</label>
-        <input type="text" id="inputNumeroAsignado" class="input-texto" placeholder="Ej: 045" autofocus>
+        <input type="text" id="inputNumeroAsignado" class="input-texto" placeholder="Escriba el número aquí" autofocus>
       </div>
 
       <button class="btn-accion btn-verde" onclick="enviarDatosAsignacion()">GUARDAR NÚMERO</button>
@@ -106,7 +224,7 @@
         <div id="devolver-nombre" class="info-valor">-</div>
       </div>
       <div class="info-grupo">
-        <div class="info-label">Cédula</div>
+        <div class="info-label">Documento de Identidad</div>
         <div id="devolver-cedula" class="info-valor">-</div>
       </div>
 
@@ -115,7 +233,6 @@
   </div>
 
   <script>
-    // CAMBIA ESTO POR TU URL DE GOOGLE WEB APP ACTUALIZADO
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby157FTjbp4_Zm98X0LiKhi8WVQgnWsW9G_4BmquA2QxUtInn5v1VTRXyO-D27PxDIl/exec";
     
     let html5QrcodeScanner = null;
@@ -126,87 +243,78 @@
     window.onerror = function(msg, url, linenumber) {
       const r = document.getElementById("resultado");
       r.className = "red";
-      r.innerHTML = "Error de ejecución: " + msg + " (Línea: " + linenumber + ")";
+      r.innerHTML = "Error interno: " + msg + " (Línea: " + linenumber + ")";
       return false;
     };
 
     function configurarModoEscaneo(modo) {
       modoActual = modo;
-      document.getElementById("contenedor-botones-menu").style.display = "none";
-      document.getElementById("btnCancelarCamara").style.display = "block";
-      document.getElementById("reader").style.display = "block";
-      
-      const r = document.getElementById("resultado");
-      r.className = "";
-      r.innerHTML = "Solicitando permisos de cámara...";
-      
-      iniciarCamara();
-    }
-
-    // CORRECCIÓN CRÍTICA DE FLUJO PARA ENTRAR A LA CÁMARA LOCAL
-    function iniciarCamara() {
       const r = document.getElementById("resultado");
       
       if (typeof Html5Qrcode === "undefined") {
         r.className = "red";
-        r.innerHTML = "Error: El archivo html5-qrcode.min.js no se encuentra en la raíz.";
+        r.innerHTML = "Error local: El archivo de la librería no se cargó correctamente.";
         return;
       }
 
-      // 1. Solicitar y enumerar las cámaras disponibles en el dispositivo
-      Html5Qrcode.getCameras().then(devices => {
-        if (devices && devices.length > 0) {
-          
-          html5QrcodeScanner = new Html5Qrcode("reader");
-          const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-          
-          // Intentar forzar el entorno trasero (environment) nativo
-          html5QrcodeScanner.start(
-            { facingMode: "environment" },
-            config,
-            codigoQrDetectado
-          ).then(() => {
-            r.className = "green";
-            r.innerHTML = "Cámara activa. Escanee el código QR.";
-          }).catch(err => {
-            // Si falla por restricción de hardware, usar el ID de la primera cámara detectada
-            html5QrcodeScanner.start(
-              devices[0].id,
-              config,
-              codigoQrDetectado
-            ).then(() => {
-              r.className = "green";
-              r.innerHTML = "Cámara encendida. Si usa la frontal, rote su teléfono.";
-            }).catch(errFinal => {
-              r.className = "red";
-              r.innerHTML = "Acceso denegado: " + errFinal;
-              cancelarEscaneo();
-            });
-          });
-          
-        } else {
-          r.className = "red";
-          r.innerHTML = "No se encontraron cámaras físicas en este terminal.";
-          cancelarEscaneo();
-        }
-      }).catch(errDispositivos => {
-        r.className = "red";
-        r.innerHTML = "Error al solicitar permisos: " + errDispositivos;
-        cancelarEscaneo();
-      });
+      document.getElementById("contenedor-botones-menu").style.display = "none";
+      document.getElementById("btnCancelarCamara").style.display = "block";
+      document.getElementById("reader").style.display = "block";
+      
+      r.className = "";
+      r.innerHTML = "Conectando con la cámara del dispositivo...";
+      
+      iniciarVideoTransmision();
     }
 
-    function codigoQrDetectado(decodedText) {
+    // ARRANQUE NATIVO REUTILIZANDO TU LÓGICA ANTERIOR EXACTA
+    function iniciarVideoTransmision() {
+      const r = document.getElementById("resultado");
+      
+      try {
+        html5QrcodeScanner = new Html5Qrcode("reader");
+        const config = {};
+        
+        html5QrcodeScanner.start(
+          { facingMode: "environment" },
+          config,
+          codigoDetectadoEnVivo
+        ).then(() => {
+          r.className = "green";
+          r.innerHTML = "Cámara encendida. Enfoque un código QR.";
+        }).catch(err => {
+          html5QrcodeScanner.start(
+            undefined,
+            config,
+            codigoDetectadoEnVivo
+          ).then(() => {
+            r.className = "green";
+            r.innerHTML = "Cámara encendida. Si es la frontal, gire el teléfono.";
+          }).catch(errFinal => {
+            r.className = "red";
+            r.innerHTML = "Acceso denegado o error de hardware: " + errFinal;
+            cancelarEscaneo();
+          });
+        });
+      } catch (exception) {
+        r.className = "red";
+        r.innerHTML = "Fallo en ejecución: " + exception.message;
+      }
+    }
+
+    function codigoDetectadoEnVivo(decodedText) {
       if (procesandoScan) return;
       procesandoScan = true;
       
       const r = document.getElementById("resultado");
       r.className = "";
-      r.innerHTML = "Consultando base de datos...";
+      r.innerHTML = "Consultando validez del pase...";
       
       html5QrcodeScanner.stop().then(() => {
         ejecutarPeticionJsonp({ accion: modoActual, codigoQR: decodedText });
-      }).catch(() => { procesandoScan = false; });
+      }).catch(err => {
+        procesandoScan = false;
+      });
     }
 
     function ejecutarPeticionJsonp(parametros) {
@@ -224,21 +332,18 @@
       script.src = WEB_APP_URL + "?" + queryParams.join("&");
       
       script.onerror = function() {
-        procesarRespuestaServidorJSONP({ ok: false, color: "red", mensaje: "Error crítico de conexión con Google." });
+        mostrarRespuestaServidorError("Error crítico de conexión con Google.");
       };
       document.body.appendChild(script);
-    }
-
-    // RETORNO GLOBAL DE JSONP
-    window.procesarRespuestaServidorJSONP = function(data) {
-
-const script = document.getElementById("jsonp-request");if (script)
-script.remove();const r = document.getElementById("resultado");if (data.ok)
-{r.innerHTML = "";r.className = "";if (data.tipoVista === "formularioAsignar")
-{codigoQRLimpioGuardado =
+}// RETORNO GLOBAL DE JSONPwindow.procesarRespuestaServidorJSONP =
+function(data) {const script = document.getElementById("jsonp-request");if
+(script) script.remove();const r = document.getElementById("resultado");if
+(data.ok) {r.innerHTML = "";r.className = "";if (data.tipoVista ===
+"formularioAsignar") {codigoQRLimpioGuardado =
 data.codigoReal;document.getElementById("asignar-nombre").innerText =
-data.nombre || "-";document.getElementById("asignar-cedula").innerText =
-data.cedula || "-";document.getElementById("inputNumeroAsignado").value =
+data.nombre || "No
+especificado";document.getElementById("asignar-cedula").innerText = data.cedula
+|| "No especificado";document.getElementById("inputNumeroAsignado").value =
 "";const img = document.getElementById("asignar-img");if (data.imagenCedula) {
 img.src = data.imagenCedula; img.style.display = "block"; }else {
 img.style.display = "none";
@@ -247,18 +352,23 @@ img.style.display = "none";
 "block";} else if (data.tipoVista === "resultadoDevolución")
 {document.getElementById("badge-mensaje-devolver").innerText =
 data.mensaje;document.getElementById("devolver-nombre").innerText = data.nombre
-|| "-";document.getElementById("devolver-cedula").innerText = data.cedula ||
-"-";const img = document.getElementById("devolver-img");if (data.imagenCedula) {
-img.src = data.imagenCedula; img.style.display = "block"; }else {
-img.style.display = "none";
-}document.getElementById("vista-escaneo").style.display =
+|| "No especificado";document.getElementById("devolver-cedula").innerText =
+data.cedula || "No especificado";const img =
+document.getElementById("devolver-img");if (data.imagenCedula) { img.src =
+data.imagenCedula; img.style.display = "block"; }else { img.style.display =
+"none"; }document.getElementById("vista-escaneo").style.display =
 "none";document.getElementById("vista-resultado-devolver").style.display =
-"block";} else {alert(data.mensaje);regresarAlMenu();}} else {r.className =
-data.color || "red";r.innerHTML = <strong>${data.mensaje || "Error"}</strong
-><br />
+"block";} else {// Guardado exitoso de
+asignaciónalert(data.mensaje);regresarAlMenu();}} else {// Manejo estructural de
+erroresr.className = data.color || "red";r.innerHTML =
+<strong>${data.mensaje || "Error"}</strong><br />
 ${data.nombre ? 'Nombre: ' + data.nombre + '<br />' : ''} ${data.cedula ?
 'Cédula: ' + data.cedula : ''};setTimeout(() => {r.innerHTML = "";r.className =
-"";procesandoScan = false;iniciarCamara();}, 6000);}};function
+"";procesandoScan = false;iniciarVideoTransmision();}, 8000);}};function
+mostrarRespuestaServidorError(msg) {const r =
+document.getElementById("resultado");r.className = "red";r.innerHTML =
+<strong>${msg}</strong>;setTimeout(() => {r.innerHTML = "";r.className =
+"";procesandoScan = false;iniciarVideoTransmision();}, 8000);}function
 enviarDatosAsignacion() {const numero =
 document.getElementById("inputNumeroAsignado").value.trim();if (!numero)
 {alert("Por favor, ingrese un número antes de
@@ -268,14 +378,16 @@ codigoQRLimpioGuardado, numeroAsignado: numero });}function cancelarEscaneo()
 regresarAlMenu(); }).catch(() => { regresarAlMenu(); });} else
 {regresarAlMenu();}}function regresarAlMenu() {procesandoScan = false;modoActual
 = "";codigoQRLimpioGuardado = "";document.getElementById("resultado").innerHTML
-= "";document.getElementById("resultado").className = "";// Resetear
-vistasdocument.getElementById("vista-formulario-asignar").style.display =
+= "";document.getElementById("resultado").className = "";// Limpiar campos
+visualesdocument.getElementById("asignar-nombre").innerText =
+"-";document.getElementById("asignar-cedula").innerText =
+"-";document.getElementById("asignar-img").src =
+"";document.getElementById("devolver-nombre").innerText =
+"-";document.getElementById("devolver-cedula").innerText =
+"-";document.getElementById("devolver-img").src = "";// Resetear visualización
+de layoutsdocument.getElementById("vista-formulario-asignar").style.display =
 "none";document.getElementById("vista-resultado-devolver").style.display =
 "none";document.getElementById("reader").style.display =
 "none";document.getElementById("btnCancelarCamara").style.display =
 "none";document.getElementById("contenedor-botones-menu").style.display =
 "block";document.getElementById("vista-escaneo").style.display = "block";}
-
-
-
-      
