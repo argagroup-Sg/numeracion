@@ -229,7 +229,7 @@
 
   <script>
     
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzI58TivA1DUp9TjKLSA-cXLLfLP_n8yfWn9b7jnpEmBAB40Bk4YplflAMYcgIZph9N/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzv_JLFAnLdI-4uoz8s__6mwkaVRBQZsooECn0WK4v7xuYi8GOEKMqAMf_eiK7LuYzn/exec";
     let html5QrcodeScanner = null;
     let procesandoScan = false;
     let modoAccionActual = ""; 
@@ -311,7 +311,6 @@
         const script = document.createElement("script");
         script.id = "jsonp-request";
         script.src = WEB_APP_URL + "?codigoQR=" + encodeURIComponent(decodedText) + "&accion=" + modoAccionActual + "&callback=procesarRespuestaServidorJSONP";
-        
         script.onerror = function() {
           maniobrarErrorServidor("Error crítico de conexión con Google.");
         };
@@ -325,7 +324,6 @@
     window.procesarRespuestaServidorJSONP = function(data) {
       const script = document.getElementById("jsonp-request");
       if (script) script.remove();
-      
       const r = document.getElementById("resultado");
       
       if (data.ok) {
@@ -347,11 +345,9 @@
           } else {
             imgElement.style.display = "none";
           }
-          
           document.getElementById("vista-escaneo").style.display = "none";
-          document.getElementById("vista-formulario-asignar").style.display = "block";
-
-          
+          document.getElementById("vista-formulario-asignar").style.display = "block"; 
+        
         // VISTA B: Confirmar Devolución
         } else if (data.tipoVista === "resultadoDevolución") {
           document.getElementById("devolver-mensaje-badge").innerText = "✓ " + data.mensaje;
@@ -364,23 +360,29 @@
             imgElement.style.display = "block";
           } else {
             imgElement.style.display = "none";
-          }
-          
+          } 
           document.getElementById("vista-escaneo").style.display = "none";
-          document.getElementById("vista-resultado-devolver").style.display = "block";
-          
+          document.getElementById("vista-resultado-devolver").style.display = "block"; 
+        
         } else {
-          // Confirmación de guardado exitoso
+          // Confirmación de guardado exitoso (Paso 2: confirmarAsignar)
           alert(data.mensaje);
           regresarAlMenuPrincipal();
         }
       } else {
-        // CORRECCIÓN: Comillas de plantilla añadidas correctamente
+        // Manejo seguro de la imagen en errores condicionales
+        let bloqueImagen = "";
+        if (data.imagenCedula) {
+          bloqueImagen = `<br><img src="${data.imagenCedula}" style="max-width:200px; display:inline-block; margin-top:10px; border-radius:6px; border:1px solid #ddd;">`;
+        }
+
         r.className = data.color || "red";
         r.innerHTML = `<strong>${data.mensaje || "Error"}</strong><br>
           ${data.nombre ? 'Nombre: ' + data.nombre + '<br>' : ''} 
-          ${data.cedula ? 'Cédula: ' + data.cedula : ''}`;
+          ${data.cedula ? 'Cédula: ' + data.cedula : ''}
+          ${bloqueImagen}`;
         
+        // Temporizador para limpiar alertas y reencender la cámara automáticamente
         setTimeout(() => {
           r.innerHTML = "";
           r.className = "";
@@ -408,17 +410,19 @@
         alert("Por favor, digite un número asignado antes de guardar.");
         return;
       }
-      
       const viejoScript = document.getElementById("jsonp-request");
       if (viejoScript) viejoScript.remove();
-      
       const script = document.createElement("script");
       script.id = "jsonp-request";
-      // Enviamos el parámetro filaDestino en lugar del código QR original
+      
+      // Callback inyectado explícitamente en la URL para resolver la petición JSONP
       script.src = WEB_APP_URL + "?accion=confirmarAsignar&filaDestino=" + encodeURIComponent(qrLimpioGuardado) + "&numeroAsignado=" + encodeURIComponent(numeroAsignadoValue) + "&callback=procesarRespuestaServidorJSONP";
+      
+      script.onerror = function() {
+        alert("Error de conexión al intentar guardar.");
+      };
       document.body.appendChild(script);
     }
-
 
     function cancelarEscaneo() {
       if (html5QrcodeScanner) {
