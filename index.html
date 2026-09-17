@@ -368,7 +368,9 @@
           const resCheck = await fetch(urlCheck, { headers: headersSupabase });
           const activos = await resCheck.json();
 
-          if (activos && Array.isArray(activos) && activos.length > 0) {
+
+          //PARA QUE DEVUELVAN
+        /*  if (activos && Array.isArray(activos) && activos.length > 0) {
             procesarRespuestaServidorJSONP({ 
               ok: false, 
               mensaje: "¡Atención! Este usuario ya tiene un número asignado sin devolver.", 
@@ -378,7 +380,7 @@
               color: "orange" 
             });
             return;
-          }
+          }*/
 
           procesarRespuestaServidorJSONP({
             ok: true,
